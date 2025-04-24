@@ -1,20 +1,15 @@
 package com.project.uber.service.implementation;
 
 import com.project.uber.constants.OrderConstants;
-import com.project.uber.dtos.ClientDto;
-import com.project.uber.dtos.DriverDto;
-import com.project.uber.dtos.OrderDto;
-import com.project.uber.dtos.VehicleDto;
+import com.project.uber.dtos.*;
 import com.project.uber.enums.Category;
 import com.project.uber.enums.OrderStatus;
 import com.project.uber.infra.exceptions.BusinessException;
 import com.project.uber.infra.exceptions.InvalidOrderStateException;
 import com.project.uber.infra.exceptions.OrderNotFoundException;
 import com.project.uber.infra.exceptions.UnauthorizedDriverException;
-import com.project.uber.model.Client;
-import com.project.uber.model.Driver;
-import com.project.uber.model.Order;
-import com.project.uber.model.Vehicle;
+import com.project.uber.model.*;
+import com.project.uber.repository.CompanyRepository;
 import com.project.uber.repository.DriverRepository;
 import com.project.uber.repository.OrderRepository;
 import com.project.uber.service.interfac.ClientService;
@@ -55,10 +50,65 @@ public class OrderServiceImpl implements OrderService {
     private DriverRepository driverRepository;
 
     @Autowired
+    private CompanyRepository companyRepository;
+
+    @Autowired
     private SimpMessagingTemplate simpMessagingTemplate;
 
     @Autowired
     private ResponseStorage responseStorage;
+
+
+    public List<OrderSummaryDto> getOrdersLast14Days(Long companyId) {
+        LocalDate startDate = LocalDate.now().minusDays(14);
+        List<Order> orders = orderRepository.findOrdersLast14Days(companyId, startDate);
+
+        // Agrupa por data e conta total de pedidos e concluídos
+        Map<LocalDate, List<Order>> groupedByDate = orders.stream().collect(Collectors.groupingBy(Order::getDate));
+
+        return groupedByDate.entrySet().stream()
+                .map(entry -> {
+                    LocalDate date = entry.getKey();
+                    long totalOrders = entry.getValue().size();
+                    long completedOrders = entry.getValue().stream()
+                            .filter(order -> order.getStatus() == OrderStatus.DELIVERED)
+                            .count();
+
+                    return new OrderSummaryDto(date, totalOrders, completedOrders);
+                })
+                .sorted((o1, o2) -> o1.getDate().compareTo(o2.getDate())) // Ordena por data
+                .collect(Collectors.toList());
+    }
+
+
+    public Map<String, Long> getOrderStatistics(Long companyId) {
+        // Verifica se a empresa existe
+        Company company = companyRepository.findById(companyId)
+                .orElseThrow(() -> new RuntimeException("Empresa não encontrada!"));
+
+        // Obtém IDs dos motoristas dessa empresa
+        List<Long> driverIds = company.getDrivers().stream()
+                .map(Driver::getId)
+                .collect(Collectors.toList());
+
+        // Busca todas as ordens associadas aos motoristas da empresa
+        long completedOrders = orderRepository.countByDriverIdInAndStatus(driverIds, OrderStatus.DELIVERED);
+        long ongoingOrders = orderRepository.countByDriverIdInAndStatus(driverIds, OrderStatus.PICKED_UP);
+        long pendingOrders = orderRepository.countByDriverIdInAndStatus(driverIds, OrderStatus.PENDING);
+
+        // Retorna um mapa com os resultados
+        Map<String, Long> stats = new HashMap<>();
+        stats.put("completed", completedOrders);
+        stats.put("ongoing", ongoingOrders);
+        stats.put("pending", pendingOrders);
+
+        return stats;
+    }
+
+
+
+
+
 
     // Saves an order based on the provided OrderDto and associated client ID.
     @Override

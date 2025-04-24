@@ -2,6 +2,7 @@ package com.project.uber.service.interfac;
 
 import com.project.uber.dtos.DriverDto;
 import com.project.uber.dtos.OrderDto;
+import com.project.uber.dtos.OrderSummaryDto;
 import com.project.uber.enums.Category;
 import com.project.uber.enums.OrderStatus;
 import com.project.uber.infra.exceptions.BusinessException;
@@ -11,8 +12,11 @@ import jakarta.transaction.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 public interface OrderService {
+
+    List<OrderSummaryDto> getOrdersLast14Days(Long companyId);
 
     public OrderDto saveOrder(OrderDto orderDto, Long clientId);
 
@@ -36,4 +40,7 @@ public interface OrderService {
 
     @Transactional
     void cancelledOrderStatus(Long orderId, Long driverId) throws Exception;
+
+
+    Map<String, Long> getOrderStatistics(Long companyId);
 }

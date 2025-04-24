@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.List;
 
 //modelmapper -> mapear os objetos
 @MappedSuperclass
@@ -18,7 +19,7 @@ import java.util.Collection;
 @Data
 public abstract class User implements UserDetails {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false, length = 100)
     private String name;
@@ -38,6 +39,8 @@ public abstract class User implements UserDetails {
     private String city;
     @Column(nullable = false, length = 20)
     private String postalCode;
+
+
 
 
     //@Transient //saved in the database as a blob, but not as a column, only saved in the front-end

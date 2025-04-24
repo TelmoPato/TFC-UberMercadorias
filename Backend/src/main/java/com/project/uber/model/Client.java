@@ -16,6 +16,11 @@ import lombok.Setter;
 @Table(name = "clients")
 public class Client extends User {
 
+    @ManyToOne
+    @JoinColumn(name = "company_id")
+    @JsonIgnore  // 🚨 Isso impede o loop infinito!
+    private Company company; // Empresa a que o cliente pertence
+
     @JsonIgnore
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)// mappedBy = "client" indica que a relação é bidirecional
     private List<Order> orders;

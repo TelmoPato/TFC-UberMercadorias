@@ -18,6 +18,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 // This Java code is part of a Spring Boot project located in the package and is responsible for managing driver-related functionalities.
 // It includes several imports from the project's own structure as well as Spring framework components.
@@ -41,6 +42,9 @@ public class DriverController {
     private OrderService orderService;
     @Autowired
     private EmailServiceImpl emailService;
+
+
+
 
     // This method handles POST requests to "/register" and registers a new driver.
     @PostMapping("/register")

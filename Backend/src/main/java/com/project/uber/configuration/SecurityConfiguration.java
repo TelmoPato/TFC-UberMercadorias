@@ -15,6 +15,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.util.List;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
@@ -25,6 +27,14 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
+                .cors(cors -> cors.configurationSource(request -> {  //ADICIONADO TELMO
+                    var corsConfig = new org.springframework.web.cors.CorsConfiguration();
+                    corsConfig.setAllowedOrigins(List.of("http://localhost:3000", "http://192.168.1.69:3000"));// Permite Next.js
+                    corsConfig.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                    corsConfig.setAllowedHeaders(List.of("*"));
+                    corsConfig.setAllowCredentials(true);
+                    return corsConfig;
+                }))
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
@@ -34,6 +44,11 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.POST, "/driver/login").permitAll()
                         .requestMatchers(HttpMethod.GET, "/ws-endpoint/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/ws/**").permitAll() // Adicionado
+                        .requestMatchers(HttpMethod.POST, "/company/{companyId}/add-driver").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/company/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/company/{companyId}/add-vehicle").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/company/{companyId}/add-client").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/company/register").permitAll()
                         .requestMatchers("/error").permitAll() // Adicionado
                         .requestMatchers(HttpMethod.POST, "/app/broadcast").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/notifications").authenticated()

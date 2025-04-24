@@ -10,8 +10,12 @@ import com.project.uber.model.Driver;
 import com.project.uber.model.Order;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface DriverService {
+
+    Optional<Driver> addDriverToCompany(Long companyId, Driver driverRequest);
+
     DriverDto saveDriver(Driver driver);
 
     void deleteDriver(Long driverId);

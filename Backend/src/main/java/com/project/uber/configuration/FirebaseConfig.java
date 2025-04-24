@@ -15,7 +15,7 @@ public class FirebaseConfig {
     @Bean
     public FirebaseApp firebaseApp() throws IOException {
         FileInputStream serviceAccount =
-                new FileInputStream("C:/Users/felip/Downloads/uber-de-mercadorias-firebase-adminsdk-w8kjt-ec021b002c.json"); // Certifique-se de que o caminho esteja correto
+                new FileInputStream("src/main/resources/uberdemercadoriastfc-firebase-adminsdk-bjw0m-37c96686ad.json"); // Certifique-se de que o caminho esteja correto
 
         FirebaseOptions options = FirebaseOptions.builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))

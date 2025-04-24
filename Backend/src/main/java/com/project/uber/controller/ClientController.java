@@ -82,8 +82,7 @@ public class ClientController {
 
     // This method returns the client profile based on the provided JWT token.
     @GetMapping("/viewProfile") // Handles GET requests for "/viewProfile".
-    public ResponseEntity<?> viewProfile(
-            @RequestHeader("Authorization") String token) { // @RequestHeader extracts the 'Authorization' header from the request.
+    public ResponseEntity<?> viewProfile(@RequestHeader("Authorization") String token) { // @RequestHeader extracts the 'Authorization' header from the request.
         // Validates the token and retrieves the client ID from it.
         Long clientId = validateTokenAndGetClientId(token);
 

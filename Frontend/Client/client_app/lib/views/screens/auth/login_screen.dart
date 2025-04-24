@@ -23,7 +23,23 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() {
       _isLoading = true;
     });
+//mudado
+    if (_emailController.text.isEmpty) {
+      setState(() {
+        _isLoading = false;
+      });
+      _showErrorDialog(context,"All fields must be filled");
+      return; // Impede que o login continue se o email não for preenchido
+    }
 
+    if (_passwordController.text.isEmpty) {
+      setState(() {
+        _isLoading = false;
+      });
+      _showErrorDialog(context,"All fields must be filled");
+      return; // Impede que o login continue se a senha não for preenchida
+    }
+//mudado
     final authApi = Provider.of<AuthApi>(context, listen: false);
     String? token = await authApi.login(_emailController.text, _passwordController.text);
 
@@ -37,17 +53,19 @@ class _LoginScreenState extends State<LoginScreen> {
             (Route<dynamic> route) => false,
       );
     } else {
-      _showErrorDialog(context);
+      _showErrorDialog(context, "Failed to login. Please try again.");
     }
   }
 
-  void _showErrorDialog(BuildContext context) {
+
+
+  void _showErrorDialog(BuildContext context,String message) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Error'),
-          content: const Text('Failed to login. Please try again.'),
+          content: Text(message),
           actions: [
             TextButton(
               child: const Text('OK'),

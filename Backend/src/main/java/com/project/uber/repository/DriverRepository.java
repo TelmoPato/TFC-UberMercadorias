@@ -20,4 +20,6 @@ public interface DriverRepository extends JpaRepository<Driver, Long> {
     List<Driver> findAvailableDrivers();
     @Query("SELECT d FROM Driver d WHERE d.vehicle.category = :category AND d.isOnline = true AND d.isBusy = false")
     List<Driver> findAvailableDriversByVehicleType(Category category);
+
+    List<Driver> findByCompanyId(Long companyId);
 }

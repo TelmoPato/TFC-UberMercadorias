@@ -17,6 +17,10 @@ public class Vehicle {
     @JsonBackReference
     private Driver driver;
 
+    @ManyToOne
+    @JoinColumn(name = "company_id", nullable = false)
+    private Company company;
+
     @Column(name = "year")
     private int year;
 

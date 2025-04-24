@@ -3,6 +3,8 @@ import 'package:intl/intl.dart'; // Adicione a dependência 'intl' ao seu pubspe
 import 'package:provider/provider.dart';
 import 'package:teste_2/views/screens/auth/login_screen.dart';
 import '../../../api/auth_api.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import '../home/home_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -37,6 +39,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _cityController.dispose();
     _postalCodeController.dispose();
     super.dispose();
+  }
+
+
+
+
+  String formatAddress(String street, String city) {
+    String fullAddress = "$street, $city"; // Junta rua e cidade
+    return Uri.encodeComponent(fullAddress); // Converte para URL-safe
+  }
+
+
+  Future<bool> isValidStreet(String street) async {
+    String street = _streetController.text;
+    String city = _cityController.text;
+
+    String formattedAddress = formatAddress(street, city);
+    String url = "https://nominatim.openstreetmap.org/search?q=$formattedAddress&format=json";
+
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      return data.isNotEmpty; // Se houver resultados, a rua é válida
+    }
+    return false; // Retorna false se a API falhar
   }
 
   Widget _buildDateField({
@@ -105,6 +132,72 @@ class _RegisterScreenState extends State<RegisterScreen> {
       _isLoading = true;
     });
 
+    // Mapeia os controladores e os nomes dos campos
+    final fields = {
+      'Name': _nameController.text,
+      'Email': _emailController.text,
+      'Birthdate': _birthdateController.text,
+      'Password': _passwordController.text,
+      'Phone Number': _phoneNumberController.text,
+      'Tax Payer Number': _taxPayerNumberController.text,
+      'Street': _streetController.text,
+      'City': _cityController.text,
+      'Postal Code': _postalCodeController.text,
+    };
+
+    // Verifica se algum campo está vazio
+    for (var entry in fields.entries) {
+      if (entry.value.isEmpty) {
+        setState(() {
+          _isLoading = false;
+        });
+        _showErrorDialog(context, "Please fill all fields");
+        return;
+      }
+    }
+
+    if (_phoneNumberController.text.length != 9) {
+      _showErrorDialog(context, "Phone number must contain exactly 9 digits.");
+      setState(() {
+        _isLoading = false;
+      });
+      return;
+    }
+
+    // Verifica se a string contém apenas números
+    if (!RegExp(r'^[0-9]+$').hasMatch(_phoneNumberController.text)) {
+      _showErrorDialog(context, "Phone number must contain only numbers.");
+      setState(() {
+        _isLoading = false;
+      });
+      return;
+    }
+
+    if (_taxPayerNumberController.text.length != 9) {
+      _showErrorDialog(context, "TaxPayerNumber must contain exactly 9 digits.");
+      setState(() {
+        _isLoading = false;
+      });
+      return;
+    }
+
+    if (!RegExp(r'^[0-9]+$').hasMatch(_taxPayerNumberController.text)) {
+      _showErrorDialog(context, "TaxPayerNumber must contain only numbers.");
+      setState(() {
+        _isLoading = false;
+      });
+      return;
+    }
+
+    if (!await isValidStreet(_streetController.text)) {
+      _showErrorDialog(context, "Invalid street address.");
+      setState(() {
+        _isLoading = false;
+      });
+      return;
+    }
+
+
     final Map<String, dynamic> registrationData = {
       'name': _nameController.text,
       'email': _emailController.text,
@@ -130,17 +223,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
             (Route<dynamic> route) => false,
       );
     } else {
-      _showErrorDialog();
+      _showErrorDialog(context,"Failed to register. Please try again.");
     }
   }
 
-  void _showErrorDialog() {
+  void _showErrorDialog(context,String message) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Error'),
-          content: const Text('Failed to register. Please try again.'),
+          content: Text(message),
           actions: [
             TextButton(
               child: const Text('OK'),

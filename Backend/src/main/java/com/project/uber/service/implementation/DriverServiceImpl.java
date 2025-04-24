@@ -3,9 +3,8 @@ package com.project.uber.service.implementation;
 import com.project.uber.dtos.*;
 import com.project.uber.enums.Category;
 import com.project.uber.infra.exceptions.BusinessException;
-import com.project.uber.model.Client;
-import com.project.uber.model.Driver;
-import com.project.uber.model.Order;
+import com.project.uber.model.*;
+import com.project.uber.repository.CompanyRepository;
 import com.project.uber.repository.DriverRepository;
 import com.project.uber.repository.OrderRepository;
 import com.project.uber.repository.VehicleRepository;
@@ -13,11 +12,11 @@ import com.project.uber.service.interfac.DriverService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import com.project.uber.model.Vehicle;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service // Marks the class as a Spring service.
 public class DriverServiceImpl implements DriverService {
@@ -31,6 +30,49 @@ public class DriverServiceImpl implements DriverService {
     private VehicleRepository vehicleRepository;
     @Autowired
     private OrderRepository orderRepository;
+
+    @Autowired
+    private CompanyRepository companyRepository;
+
+    @Override
+    public Optional<Driver> addDriverToCompany(Long companyId, Driver driverRequest) {
+        Optional<Company> companyOptional = companyRepository.findById(companyId);
+        Optional<Vehicle> vehicleOptional = vehicleRepository.findById(driverRequest.getVehicle().getId());
+
+        if (companyOptional.isPresent() && vehicleOptional.isPresent()) {
+            Company company = companyOptional.get();
+            Vehicle vehicle = vehicleOptional.get();
+
+            // ⚠️ Garantir que o veículo pertence à empresa
+            if (!vehicle.getCompany().getId().equals(companyId)) {
+                return Optional.empty();
+            }
+
+            Driver driver = new Driver(
+                    driverRequest.getName(),
+                    driverRequest.getEmail(),
+                    driverRequest.getPassword(),
+                    driverRequest.getBirthdate(),
+                    driverRequest.getPhoneNumber(),
+                    driverRequest.getTaxPayerNumber(),
+                    driverRequest.getStreet(),
+                    driverRequest.getCity(),
+                    driverRequest.getPostalCode(),
+                    driverRequest.getSalary(),
+                    vehicle,
+                    driverRequest.getLocation()
+            );
+
+            driver.setCompany(company);
+
+            return Optional.of(driverRepository.save(driver));
+        }
+
+        return Optional.empty();
+    }
+
+
+
 
     @Transactional //para garantir que as duas operações sejam executadas ou nenhuma
     public DriverDto saveDriver(Driver driver) {
