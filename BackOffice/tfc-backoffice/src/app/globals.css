@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Modo Claro */
+/* Definições para o modo claro */
+:root {
+  --background: #ffffff !important; /* Branco puro */
+  --foreground: #171717 !important;
+}
+
+/* Modo Escuro */
+body.dark {
+  --background: #121212;
+  --foreground: #ffffff;
+}
+
+/* Aplicação global das cores */
+body {
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Ajuste para os componentes */
+.card {
+  background-color: #ffffff;
+  color: #171717;
+}
+
+/* Modo escuro nos cards */
+body.dark .card {
+  background-color: #333;
+  color: white;
+}
+
+/* FORÇA o fundo azul no modo claro */
+body:not(.dark) {
+  background-color: #e3f2fd !important;
+  color: #171717 !important;
+}
+
+/* Preferência do sistema */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
