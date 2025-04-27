@@ -48,10 +48,12 @@ cd Trabalho-Final-de-Curso
 # Instale as dependências
 # Para o backend
 cd backend
+
 ./mvnw install
 
 # Para o frontend
 cd ../frontend
+
 flutter pub get
 
 # Inicie o servidor backend
@@ -64,6 +66,7 @@ flutter run
 cd ../Trabalho-Final-de-Curso\BackOffice\tfc-backoffice
 
 #Inicie o site BackOffice
+
 npm run dev
 
 
