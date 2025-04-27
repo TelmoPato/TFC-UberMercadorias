@@ -10,10 +10,12 @@ Telmo Flores Pato,
 Tomas Damaso Maria
 
 Orientador: Rui Santos
-Direitos de Cópia
+
+
 Este trabalho é protegido por direitos autorais e foi publicado com permissão para uso acadêmico e pesquisa, conforme regulamento da Universidade Lusófona.
 
 Resumo do Projeto
+
 O projeto desenvolve uma plataforma digital para otimizar o transporte de mercadorias utilizando tecnologia de ponta e um foco na experiência do usuário. O sistema é projetado para ser acessível, transparente e adaptável às necessidades variadas do mercado, oferecendo uma solução integrada para clientes e transportadores.
 
 Tecnologias Utilizadas
@@ -65,5 +67,4 @@ cd ../Trabalho-Final-de-Curso\BackOffice\tfc-backoffice
 npm run dev
 
 
-Licença
 Este projeto está sob a licença da Universidade Lusófona. Veja o arquivo LICENSE para mais detalhes.
