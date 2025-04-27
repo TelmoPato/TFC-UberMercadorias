@@ -4,8 +4,9 @@ O projeto "Uber de Transporte de Mercadorias" é uma plataforma digital inovador
 
 
 
-Desenvolvedores
-Telmo Flores Pato
+Desenvolvedores:
+Telmo Flores Pato,
+
 Tomas Damaso Maria
 
 Orientador: Rui Santos
