@@ -1,11 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react"; // <-- importar useEffect
 
 export default function AddVehicle() {
   const router = useRouter();
-  const companyId = 1; // Ajuste conforme necessário
 
   const [vehicle, setVehicle] = useState({
     category: "",
@@ -16,6 +15,19 @@ export default function AddVehicle() {
   });
 
   const [message, setMessage] = useState("");
+  const [companyId, setCompanyId] = useState<number | null>(null); // <-- estado
+
+
+   useEffect(() => {
+  const storedId = localStorage.getItem("companyId");
+  if (storedId) {
+    setCompanyId(parseInt(storedId));
+  } else {
+    alert("ID da empresa não encontrado. Faça login novamente.");
+    window.location.href = "/login";
+  }
+}, []);
+  
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setVehicle({ ...vehicle, [e.target.name]: e.target.value });
@@ -23,6 +35,12 @@ export default function AddVehicle() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+     if (!companyId) {
+    setMessage("⚠️ ID da empresa não encontrado.");
+    return;
+  }
+
 
     if (!vehicle.category || !vehicle.year || !vehicle.plate || !vehicle.brand || !vehicle.model) {
       setMessage("⚠️ Todos os campos são obrigatórios!");
@@ -47,6 +65,9 @@ export default function AddVehicle() {
       if (response.ok) {
         setMessage("✅ Veículo adicionado com sucesso!");
         setVehicle({ category: "", year: "", plate: "", brand: "", model: "" });
+         setTimeout(() => {
+           router.push("/vehicles/seevehicles");
+         }, 1500); // redireciona após 1.5s
       } else {
         setMessage("❌ Erro ao adicionar veículo.");
       }

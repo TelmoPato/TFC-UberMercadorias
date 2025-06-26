@@ -14,23 +14,33 @@ export default function ViewClientsPage() {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  const companyId = 1; // Defina aqui o ID da empresa para buscar os clientes
+  const [companyId, setCompanyId] = useState<number | null>(null); // <-- estado
 
   useEffect(() => {
-    const fetchClients = async () => {
-      try {
-        const response = await axios.get(`http://localhost:8080/company/${companyId}/clients`);
-        setClients(response.data);
-      } catch (err) {
-        setError("Erro ao buscar clientes"); // Corrigido erro de TypeScript
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchClients();
+    const storedId = localStorage.getItem("companyId");
+    if (storedId) {
+      setCompanyId(parseInt(storedId));
+    }
   }, []);
+
+
+  useEffect(() => {
+  if (!companyId) return; // não executa enquanto companyId for null
+
+  const fetchClients = async () => {
+    try {
+      const response = await axios.get(`http://localhost:8080/company/${companyId}/clients`);
+      setClients(response.data);
+    } catch (err) {
+      setError("Erro ao buscar clientes");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchClients();
+}, [companyId]); // <- agora escuta mudanças em companyId
+
 
   return (
     <div className="p-6">

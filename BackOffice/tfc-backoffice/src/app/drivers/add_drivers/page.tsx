@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
+
 
 export default function AddDriverPage() {
   const [formData, setFormData] = useState({
@@ -20,23 +22,39 @@ export default function AddDriverPage() {
     location: "",
   });
 
+  const router = useRouter();
   const [vehicles, setVehicles] = useState([]);
+  const [companyId, setCompanyId] = useState<number | null>(null);
   const [popup, setPopup] = useState<{ type: "success" | "error"; message: string } | null>(null);
-
-  const companyId = 1; // ID fixo da empresa
+  
 
   useEffect(() => {
-    const fetchVehicles = async () => {
-      try {
-        const response = await axios.get(`http://localhost:8080/company/${companyId}/vehicles`);
-        setVehicles(response.data);
-      } catch (error) {
-        console.error("Erro ao buscar veículos:", error);
-      }
-    };
+  const storedId = localStorage.getItem("companyId");
+  if (storedId) {
+    setCompanyId(parseInt(storedId));
+  } else {
+    alert("ID da empresa não encontrado. Faça login novamente.");
+    window.location.href = "/login";
+  }
+}, []);
 
-    fetchVehicles();
-  }, []);
+
+
+  useEffect(() => {
+  if (!companyId) return; // só roda se companyId estiver presente
+
+  const fetchVehicles = async () => {
+    try {
+      const response = await axios.get(`http://localhost:8080/company/${companyId}/vehicles`);
+      setVehicles(response.data);
+    } catch (error) {
+      console.error("Erro ao buscar veículos:", error);
+    }
+  };
+
+  fetchVehicles();
+}, [companyId]); // 👈 importante: adiciona dependência
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -76,7 +94,13 @@ export default function AddDriverPage() {
           vehicleId: "",
           location: "",
         });
+        
       }
+
+      setTimeout(() => {
+        router.push("/drivers/seedrivers");
+      }, 1500); // espera 1.5s para mostrar o popup antes de redirecionar
+
     } catch (error) {
       setPopup({ type: "error", message: "Erro ao cadastrar motorista. Tente novamente!" });
     }

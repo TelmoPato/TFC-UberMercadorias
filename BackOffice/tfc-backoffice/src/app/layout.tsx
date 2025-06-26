@@ -1,8 +1,9 @@
-"use client"; // Garante que o código roda no cliente
+"use client";
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { Geist, Geist_Mono } from "next/font/google";
 import Sidebar from "./components/ui/Sidebar";
-import "./globals.css"; // CSS global
+import "./globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,16 +16,18 @@ const geistMono = Geist_Mono({
 });
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const pathname = usePathname();
   const [isDarkMode, setIsDarkMode] = useState(false);
 
-  // Verifica o estado do tema no localStorage na inicialização
+  const hideSidebarRoutes = ["/", "/registo"];
+  const showSidebar = !hideSidebarRoutes.includes(pathname);
+
   useEffect(() => {
     const savedMode = localStorage.getItem("darkMode") === "true";
     setIsDarkMode(savedMode);
     document.body.classList.toggle("dark", savedMode);
   }, []);
 
-  // Alterna o modo escuro e claro
   const toggleDarkMode = () => {
     setIsDarkMode((prev) => {
       const newMode = !prev;
@@ -39,11 +42,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <head></head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <div className="h-screen flex relative">
-          <Sidebar />
+          {showSidebar && <Sidebar />}
           <main className="flex-1 p-4 bg-transparent min-h-screen">
             {children}
           </main>
-          {/* Botão de alternância de tema */}
           <button
             onClick={toggleDarkMode}
             className="absolute top-4 right-4 p-2 bg-gray-800 text-white rounded-full hover:bg-gray-600 transition"

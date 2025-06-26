@@ -12,25 +12,37 @@ interface Company {
 }
 
 export default function CompanyPage() {
+  const [companyId, setCompanyId] = useState<number | null>(null);
   const [company, setCompany] = useState<Company | null>(null);
 
+
   useEffect(() => {
-    fetch("http://localhost:8080/company/1")
-      .then((res) => {
-        console.log("Resposta da API:", res);
-        if (!res.ok) {
-          throw new Error("Erro ao buscar empresa: " + res.status);
-        }
-        return res.json();
-      })
-      .then((data: Company) => {
-        console.log("Dados recebidos:", data);
-        setCompany(data);
-      })
-      .catch((error) => {
-        console.error("Erro ao buscar empresa", error);
-      });
-  }, []);
+  const storedId = localStorage.getItem("companyId");
+  if (storedId) {
+    setCompanyId(parseInt(storedId));
+  } else {
+    alert("ID da empresa não encontrado. Faça login novamente.");
+    window.location.href = "/login";
+  }
+}, []);
+
+
+  useEffect(() => {
+  if (!companyId) return; // 👈 evita rodar com null
+
+  fetch(`http://localhost:8080/company/${companyId}`)
+    .then((res) => {
+      if (!res.ok) throw new Error("Erro ao buscar empresa: " + res.status);
+      return res.json();
+    })
+    .then((data: Company) => {
+      setCompany(data);
+    })
+    .catch((error) => {
+      console.error("Erro ao buscar empresa", error);
+    });
+}, [companyId]); // 👈 depende de companyId
+
 
   if (!company) return <p>Carregando...</p>;
 

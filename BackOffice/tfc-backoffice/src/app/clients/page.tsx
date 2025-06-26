@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
-import { useRouter } from "next/navigation"; // Para redirecionamento correto no Next.js 13+
+import { useRouter } from "next/navigation";
 
 export default function CreateClientPage() {
+  const [companyId, setCompanyId] = useState<number | null>(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -14,25 +15,34 @@ export default function CreateClientPage() {
   const [street, setStreet] = useState("");
   const [city, setCity] = useState("");
   const [postalCode, setPostalCode] = useState("");
-  const [companyId, setCompanyId] = useState("");
+
   const router = useRouter();
 
+  // Pega o companyId automaticamente do localStorage
+  useEffect(() => {
+  const storedId = localStorage.getItem("companyId");
+  if (storedId) {
+    setCompanyId(parseInt(storedId)); // 👈 garante que é número
+  } else {
+    alert("ID da empresa não encontrado. Faça login novamente.");
+    router.push("/login");
+  }
+}, [router]);
+
+
   const handleCreateClient = async () => {
-    if (!companyId) {
-      alert("Por favor, insira o ID da empresa!");
-      return;
-    }
+    if (!companyId) return;
 
     try {
       const response = await axios.post(
-        `http://localhost:8080/company/1/add-client`,
+        `http://localhost:8080/company/${companyId}/add-client`,
         {
           name,
           email,
           password,
           birthdate,
           phoneNumber,
-          taxPayerNumber: parseInt(taxPayerNumber), // Garante que seja número
+          taxPayerNumber: parseInt(taxPayerNumber),
           street,
           city,
           postalCode,
@@ -40,7 +50,7 @@ export default function CreateClientPage() {
       );
 
       console.log("Cliente criado:", response.data);
-      router.push("/"); // Redireciona para a página inicial
+      router.push("/"); // Redireciona para home
     } catch (error) {
       console.error("Erro ao criar cliente:", error);
       alert("Erro ao criar cliente. Verifique os dados.");
@@ -51,15 +61,7 @@ export default function CreateClientPage() {
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Criar Cliente</h1>
       <div className="space-y-4">
-        <div>
-          <label className="block">ID da Empresa</label>
-          <input
-            type="text"
-            className="w-full p-2 border border-gray-300 rounded"
-            value={companyId}
-            onChange={(e) => setCompanyId(e.target.value)}
-          />
-        </div>
+        {/* Campos do formulário */}
         <div>
           <label className="block">Nome</label>
           <input

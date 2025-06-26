@@ -15,16 +15,16 @@ export default function Sidebar() {
         <SheetTitle>Sidebar</SheetTitle>
 
         <nav className="space-y-4">
-          <Link href="/" className="block p-2 hover:bg-gray-200 rounded">
+          <Link href="/dashboard" className="block p-2 hover:bg-gray-200 rounded">
             🏠 Dashboard
           </Link>
-          <Link href="/dashboard/clients" className="block p-2 hover:bg-gray-200 rounded">
+          <Link href="/clients" className="block p-2 hover:bg-gray-200 rounded">
             👥 Clientes
           </Link>
-          <Link href="/dashboard/company" className="block p-2 hover:bg-gray-200 rounded">
+          <Link href="/company" className="block p-2 hover:bg-gray-200 rounded">
             🏢 Empresa
           </Link>
-          <Link href="/dashboard/view-clients" className="block p-2 hover:bg-gray-200 rounded">
+          <Link href="/view-clients" className="block p-2 hover:bg-gray-200 rounded">
             🔍 Ver Clientes
           </Link>
           <Link href="/drivers/seedrivers" className="block p-2 hover:bg-gray-200 rounded">
@@ -38,6 +38,9 @@ export default function Sidebar() {
           </Link>
           <Link href="/vehicles/seevehicles" className="block p-2 hover:bg-gray-200 rounded">
             🚲 Veiculos
+          </Link>
+          <Link href="/" className="block p-2 hover:bg-gray-200 rounded">
+            ❌ Logout
           </Link>
         </nav>
       </SheetContent>

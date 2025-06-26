@@ -14,27 +14,41 @@ interface Vehicle {
 export default function Vehicles() {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
-  const companyId = 1; // ID da empresa
+  const [companyId, setCompanyId] = useState<number | null>(null); // <-- estado
 
   useEffect(() => {
-    // Buscar veículos
-    fetch(`http://localhost:8080/company/${companyId}/vehicles`)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Erro ao buscar veículos: " + response.status);
-        }
-        return response.json();
-      })
-      .then((data: Vehicle[]) => {
-        console.log("Veículos carregados:", data);
-        setVehicles(data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Erro ao buscar veículos:", error);
-        setLoading(false);
-      });
-  }, []);
+  const storedId = localStorage.getItem("companyId");
+  if (storedId) {
+    setCompanyId(parseInt(storedId));
+  } else {
+    alert("ID da empresa não encontrado. Faça login novamente.");
+    window.location.href = "/login";
+  }
+}, []);
+  
+
+  useEffect(() => {
+  if (!companyId) return; // aguarda o ID ser carregado
+
+  setLoading(true); // mostra carregando até terminar a requisição
+
+  fetch(`http://localhost:8080/company/${companyId}/vehicles`)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Erro ao buscar veículos: " + response.status);
+      }
+      return response.json();
+    })
+    .then((data: Vehicle[]) => {
+      setVehicles(data);
+      setLoading(false);
+    })
+    .catch((error) => {
+      console.error("Erro ao buscar veículos:", error);
+      setLoading(false);
+    });
+}, [companyId]); // <-- depende de companyId!
+
 
   if (loading) return (
     <div className="flex justify-center items-center h-screen">
