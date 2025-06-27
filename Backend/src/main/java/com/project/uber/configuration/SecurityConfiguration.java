@@ -38,6 +38,8 @@ public class SecurityConfiguration {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers(HttpMethod.POST, "/company/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/company/register").permitAll()
                         .requestMatchers(HttpMethod.POST, "/client/register").permitAll()
                         .requestMatchers(HttpMethod.POST, "/client/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/driver/register").permitAll()
@@ -48,7 +50,9 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.GET, "/company/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/company/{companyId}/add-vehicle").permitAll()
                         .requestMatchers(HttpMethod.POST, "/company/{companyId}/add-client").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/company/{companyId}/logo").permitAll()
                         .requestMatchers(HttpMethod.POST, "/company/register").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/drivers/{id}").permitAll()
                         .requestMatchers("/error").permitAll() // Adicionado
                         .requestMatchers(HttpMethod.POST, "/app/broadcast").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/notifications").authenticated()

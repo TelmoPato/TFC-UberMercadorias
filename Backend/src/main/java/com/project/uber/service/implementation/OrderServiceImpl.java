@@ -58,7 +58,7 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private ResponseStorage responseStorage;
 
-
+    @Transactional
     public List<OrderSummaryDto> getOrdersLast14Days(Long companyId) {
         LocalDate startDate = LocalDate.now().minusDays(14);
         List<Order> orders = orderRepository.findOrdersLast14Days(companyId, startDate);
@@ -79,8 +79,7 @@ public class OrderServiceImpl implements OrderService {
                 .sorted((o1, o2) -> o1.getDate().compareTo(o2.getDate())) // Ordena por data
                 .collect(Collectors.toList());
     }
-
-
+    @Transactional
     public Map<String, Long> getOrderStatistics(Long companyId) {
         // Verifica se a empresa existe
         Company company = companyRepository.findById(companyId)

@@ -1,5 +1,7 @@
 package com.project.uber.controller;
+import com.project.uber.repository.DriverRepository;
 import jakarta.validation.Valid;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import com.project.uber.dtos.*;
 import com.project.uber.enums.OrderStatus;
@@ -38,13 +40,25 @@ public class DriverController {
     private AuthenticationService authenticationService;
     @Autowired
     private DriverService driverService;
+
+    @Autowired
+    private DriverRepository driverRepository;
     @Autowired
     private OrderService orderService;
     @Autowired
     private EmailServiceImpl emailService;
 
 
-
+    @Transactional()
+    @DeleteMapping("/drivers/{id}")
+    public ResponseEntity<?> deleteDriverCompany(@PathVariable Long id) {
+        try {
+            driverRepository.deleteById(id);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao deletar condutor");
+        }
+    }
 
     // This method handles POST requests to "/register" and registers a new driver.
     @PostMapping("/register")
@@ -187,7 +201,7 @@ public class DriverController {
             @PathVariable Long orderId,  // The order details needed for the pickup confirmation.
             @RequestHeader("Authorization") String token) { // The token is required to authenticate the driver.
         try {
-           Long driverId = validateTokenAndGetDriverId(token); // Validates the token and retrieves the driver ID.
+            Long driverId = validateTokenAndGetDriverId(token); // Validates the token and retrieves the driver ID.
             orderService.deliverOrderStatus(orderId, driverId); // Calls the order service to confirm the pickup.
             return ResponseEntity.ok().build(); // Returns an OK response if successful.
         } catch (Exception e) {
@@ -258,7 +272,7 @@ public class DriverController {
     }
 
     // This GET method retrieves the order history for a driver.
-   @GetMapping("/orderHistory")
+    @GetMapping("/orderHistory")
     public ResponseEntity<List<OrderDto>> getDriverOrderHistory(
             @RequestHeader("Authorization") String token) { // The token is used to authenticate the driver.
         try {

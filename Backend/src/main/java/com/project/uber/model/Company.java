@@ -15,6 +15,12 @@ import java.util.List;
 @Table(name = "companies")
 public class Company extends User {
 
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @Column(name = "logo")
+    private byte[] logo;
+
+
     @JsonIgnore
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
     private List<Driver> drivers;

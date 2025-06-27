@@ -14,7 +14,9 @@ import java.util.Collection;
 import java.util.List;
 
 //modelmapper -> mapear os objetos
-@MappedSuperclass
+@Entity
+@Table(name = "users")
+@Inheritance(strategy = InheritanceType.JOINED)
 @NoArgsConstructor
 @Data
 public abstract class User implements UserDetails {

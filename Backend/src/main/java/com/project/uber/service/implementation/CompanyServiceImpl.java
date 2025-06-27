@@ -6,6 +6,7 @@ import com.project.uber.model.Driver;
 import com.project.uber.repository.ClientRepository;
 import com.project.uber.repository.CompanyRepository;
 import com.project.uber.repository.DriverRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -33,7 +34,26 @@ public class CompanyServiceImpl {
         return driverRepository.findByCompanyId(companyId);
     }
 
+
+    public Long authenticateCompany(String username, String password) {
+        Company company = companyRepository.findByName(username)
+                .orElseThrow(() -> new IllegalArgumentException("Empresa não encontrada"));
+
+        if (!passwordEncoder.matches(password, company.getPassword())) {
+            throw new IllegalArgumentException("Senha incorreta");
+        }
+
+        return company.getId();
+    }
+
     public Company registerCompany(Company company) {
+        // Verificar se já existe uma empresa com o mesmo nome
+        Optional<Company> existingCompany = companyRepository.findByName(company.getName());
+
+        if (existingCompany.isPresent()) {
+            throw new IllegalArgumentException("Já existe uma empresa com este nome.");
+        }
+
         company.setPassword(passwordEncoder.encode(company.getPassword()));
         return companyRepository.save(company);
     }
@@ -45,7 +65,7 @@ public class CompanyServiceImpl {
     public Optional<Company> getCompanyById(Long id) {
         return companyRepository.findById(id);
     }
-
+    @Transactional
     public Optional<Company> addClientToCompany(Long companyId, Client client) {
         Optional<Company> companyOptional = companyRepository.findById(companyId);
 

@@ -7,6 +7,7 @@ import com.project.uber.repository.VehicleRepository;
 import com.project.uber.service.interfac.VehicleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,7 +20,7 @@ public class VehicleServiceImpl implements VehicleService{
 
     @Autowired
     private CompanyRepository companyRepository;
-
+    @Transactional()
     @Override
     public List<Vehicle> getVehiclesByCompany(Long companyId) {
         return vehicleRepository.findByCompanyId(companyId);
